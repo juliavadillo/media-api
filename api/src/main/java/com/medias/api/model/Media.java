@@ -9,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-
 @Entity
 @Table(name = "media")
 public class Media implements Serializable {
@@ -26,48 +25,78 @@ public class Media implements Serializable {
 	private Integer duration;
 	@Column
 	private Date uploadDate;
-	@Column	
+	@Column
 	private Boolean deleted;
-	
-	public Integer getId() {
-		return id;
-	}
-	public void setId(Integer id) {
-		this.id = id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getUrl() {
-		return url;
-	}
-	public void setUrl(String url) {
-		this.url = url;
-	}
-	public Integer getDuration() {
-		return duration;
-	}
-	public void setDuration(Integer duration) {
-		this.duration = duration;
-	}
-	public Date getUploadDate() {
-		return uploadDate;
-	}
-	public void setUploadDate(Date uploadDate) {
-		this.uploadDate = uploadDate;
-	}
-	public Boolean getDeleted() {
-		return deleted;
-	}
-	public void setDeleted(Boolean deleted) {
-		this.deleted = deleted;
+
+	public Media() {
 	}
 	
 	
 
+	public Media(String name, Integer duration, Date uploadDate, Boolean deleted) {
+		this.name = name;
+		this.duration = duration;
+		this.uploadDate = uploadDate;
+		this.deleted = deleted;
+	}
+
+
+	public Media(Integer id, String name, String url, Integer duration, Date uploadDate, Boolean deleted) {
+		this.id = id;
+		this.name = name;
+		this.url = url;
+		this.duration = duration;
+		this.uploadDate = uploadDate;
+		this.deleted = deleted;
+	}
 	
 	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public Integer getDuration() {
+		return duration;
+	}
+
+	public void setDuration(Integer duration) {
+		this.duration = duration;
+	}
+
+	public Date getUploadDate() {
+		return uploadDate;
+	}
+
+	public void setUploadDate(Date uploadDate) {
+		this.uploadDate = uploadDate;
+	}
+
+	public Boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
+	}
+
 }
