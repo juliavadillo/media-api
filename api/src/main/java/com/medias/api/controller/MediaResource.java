@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,9 +24,13 @@ import com.medias.api.model.Media;
 import com.medias.api.repository.MediaRepository;
 import com.medias.api.service.AmazonClient;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+@CrossOrigin(origins = "*")
 @RestController
 @Validated
 @RequestMapping(value = "/medias")
+@Api(value="Medias API REST")
 public class MediaResource {
 
 	@Autowired
@@ -37,7 +42,8 @@ public class MediaResource {
 	public MediaResource(AmazonClient amazonClient) {
 		this.amazonClient = amazonClient;
 	}
-
+	
+	@ApiOperation(value="Retorna uma lista de Medias registradas, se deleted=true, retorna as que ja foram deletadas, se deleted=false retorna somente as que não foram deletadas")
 	@GetMapping
 	public List<Media> listMedias(@RequestParam(value = "deleted") String deleted) {
 		if (deleted.equals("false")) {
@@ -46,25 +52,27 @@ public class MediaResource {
 			return mediaRepository.findAll();
 		}
 	}
-
+	
+	@ApiOperation(value="Retorna uma media referente ao id filtrado")
 	@GetMapping("/{id}")
 	public Optional<Media> listMediaById(@PathVariable(value = "id") Integer id) {
 		return mediaRepository.findById(id);
 	}
 
+	@ApiOperation(value="Insere uma nova media")
 	@PostMapping
 	public ResponseEntity<Media> saveMedia(@Valid @RequestBody MediaDTO mediaDto) {
 		Media media = mediaDto.convertDTOtoMedia(mediaDto);
-		String url = this.amazonClient.uploadMedia(media);
-		media.setUrl(url);
+		media.setUrl(this.amazonClient.createURL(media));
 		mediaRepository.save(media);
+		this.amazonClient.uploadMedia(media);
 		return ResponseEntity.ok(media);
 	}
 
 	@DeleteMapping("/{id}")
 	public void deleteMedia(@PathVariable(value = "id") Integer id) {
 		Optional<Media> resultMedia = mediaRepository.findById(id);
-		if (resultMedia.isPresent()) {
+		if (resultMedia.isPresent() && !resultMedia.get().getDeleted()) {
 			Media media = resultMedia.get();
 			this.amazonClient.deleteFile(media.getName());
 			media.setDeleted(true);
@@ -82,10 +90,9 @@ public class MediaResource {
 			media.setName(mediaDto.getName());
 			media.setDuration(mediaDto.getDuration());
 			media.setUploadDate(mediaDto.getUploadDate());
-
-			String url = this.amazonClient.updateMediaFile(media, registeredFileName);
-			media.setUrl(url);
+			media.setUrl(this.amazonClient.createURL(media));
 			mediaRepository.save(media);
+			this.amazonClient.updateMediaFile(media, registeredFileName);
 			return ResponseEntity.ok(media);
 		} else {
 			return ResponseEntity.badRequest().build();

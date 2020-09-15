@@ -2,13 +2,13 @@ package com.medias.api.controller;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -22,11 +22,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.medias.api.dto.MediaDTO;
 import com.medias.api.model.Media;
 import com.medias.api.repository.MediaRepository;
+import com.medias.api.service.AmazonClient;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -41,14 +41,15 @@ class MediaResourceTest {
 
 	@MockBean
 	MediaRepository mediaRepository;
+	
+	@MockBean
+	AmazonClient amazonClient;
 
 	private Media media1;
 
 	private Media media2;
 
-	private String media1Json;
-
-	private String media2Json;
+	private String endpointUrl = "https://register-medias.s3-sa-east-1.amazonaws.com";
 
 
 	@BeforeAll
@@ -77,12 +78,19 @@ class MediaResourceTest {
 	}
 	
 	@Test
-	void whenlistMediaByIdThenShoulReturnMedia() throws Exception {		
-		Mockito.when(mediaRepository.findById(2)).thenReturn(Optional.of(media2));
-		mockMvc.perform(get("/medias/2")).andExpect(status().isOk()).andExpect(jsonPath("$[*]", hasSize(1)))
-				.andExpect(jsonPath("$[0].id", is(2))).andExpect(jsonPath("$[0].name", is("video2")))
-				.andExpect(jsonPath("$[0].deleted", is(true)));
+	void whenPostMediaWithNameAttributeThenShouldReturnOk() throws Exception {
+		MediaDTO mediaDTO = new MediaDTO("fileName",55);
+		Media media = mediaDTO.convertDTOtoMedia(mediaDTO);
+		String url = endpointUrl+ "/" + mediaDTO.getName()+".txt";
+		Mockito.when(amazonClient.createURL(media)).thenReturn(url);
 
+		mockMvc.perform(post("/medias").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(media))).andExpect(status().isOk());
+	}
+
+	@Test
+	void whenPostMediaWithoutNameAttributeThenShouldReturnBadRequest() throws Exception {
+		MediaDTO mediaDTO = new MediaDTO();
+		mockMvc.perform(post("/medias").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(mediaDTO))).andExpect(status().isBadRequest());
 	}
 
 	

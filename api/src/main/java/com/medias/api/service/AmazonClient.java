@@ -39,18 +39,23 @@ public class AmazonClient {
 		this.s3client = AmazonS3ClientBuilder.standard().withRegion("sa-east-1").withCredentials(new AWSStaticCredentialsProvider(awsCreds))
 				.build();
 	}
-
-	public String uploadMedia(Media media) {
+	
+	public String createURL(Media media){
 		String fileUrl = "";
-		File file = convertMediaToFile(media);
 		String fileName = media.getName()+".txt";
 		fileUrl = endpointUrl + "/" + fileName;
+		return fileUrl;
+	}
+
+	public void uploadMedia(Media media) {
+
+		File file = convertMediaToFile(media);
+		String fileName = media.getName()+".txt";
 
 		s3client.putObject(
 				new PutObjectRequest(bucketName, fileName, file).withCannedAcl(CannedAccessControlList.PublicRead));
 		file.delete();
 
-		return fileUrl;
 	}
 
 	private File convertMediaToFile(Media media) {
@@ -77,9 +82,9 @@ public class AmazonClient {
 		return file;
 	}
 
-	public String updateMediaFile(Media media, String registeredFileName) {
+	public void updateMediaFile(Media media, String registeredFileName) {
 		deleteFile(registeredFileName);
-		return uploadMedia(media);
+		uploadMedia(media);
 	}
 
 	public void deleteFile(String mediaName) {

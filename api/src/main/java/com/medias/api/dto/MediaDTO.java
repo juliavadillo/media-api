@@ -22,6 +22,9 @@ public class MediaDTO {
 		this.name = name;
 		this.duration = duration;
 	}
+	public MediaDTO() {
+	}
+	
 	public String getName() {
 		return name;
 	}
