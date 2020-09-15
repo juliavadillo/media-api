@@ -26,3 +26,4 @@ Via IDE(Eclipse, etc): Selecionar a classe MediaResourceTest.java -> Run As -> J
    Via console: -Na pasta api(media-api/api) abrir o console e rodar o comando "mvn test"
    
  
+Coleção POSTMAN de request: https://www.getpostman.com/collections/3fac633ab3e23fa1bbdb
