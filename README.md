@@ -2,7 +2,8 @@
 REST API developed to manage medias
 
 Esssa API tem como objetivo receber registros de medias e publicados no S3 Bucker da AWS.
-Documentação Open API realizada com o Swagger disponível no link após a execução da aplicação: http://localhost:8080/swagger-ui/index.html#/
+Aplicação disponibilizada na AWS: http://mediaapp.sa-east-1.elasticbeanstalk.com/medias?deleted=false
+Documentação Open API realizada com o Swagger disponível no link: http://mediaapp.sa-east-1.elasticbeanstalk.com/swagger-ui/index.html#/media-resource
 
 Rodar a aplicação localmente: 
 1. Necessário criar um banco de dados Postgres.
